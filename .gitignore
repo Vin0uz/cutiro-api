@@ -1,3 +1,9 @@
 .serverless
 *.pyc
 *.pyo
+.idea/cutiro-api.iml
+.idea/modules.xml
+.idea/workspace.xml
+.idea/vcs.xml
+.idea/
+
