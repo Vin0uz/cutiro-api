@@ -1,0 +1,15 @@
+name: cleaning
+events:
+- http:
+    path: cleaning/start
+    method: get
+
+definition:
+  Comment: "Cleaning state machine of cutiro"
+  StartAt: Trigger
+  States:
+    Trigger:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [trigger, Arn]
+      End: true
