@@ -42,13 +42,12 @@ def mapping_correspondance_exacte():
             except: pass
     return res, df_emis, df_payroll
 
+mapping, df_emis, df_payroll = mapping_correspondance_exacte()
 
 def step_1_et_2():
     """
     Renvoit une liste de correspondances exactes 1:1 entre les deux fichiers, et une liste de correspondances multiples.
     """
-    mapping = mapping_correspondance_exacte()[0]
-
     e_dict = {}
     p_dict = {}
 
