@@ -1,6 +1,4 @@
 import json
-import datetime
-
 
 def endpoint(event, context):
     body = {

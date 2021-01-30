@@ -18,7 +18,16 @@ provider:
 
 functions:
   trigger:
-    handler : handler.endpoint
+    handler : trigger/handler.endpoint
+  first_step:
+    handler : step1/handler.start
+  second_step:
+    handler : step2/handler.start
+  third_step:
+    handler : step3/handler.start
+  fourth_step:
+    handler : step4/handler.start
+
 
 stepFunctions:
   stateMachines:
