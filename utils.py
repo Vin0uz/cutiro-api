@@ -2,6 +2,7 @@ import json
 import pandas as pd
 import string
 import numpy as np
+from scoring import is_anagram
 
 def read_data_from_event(event):
   source_teachers = event["source_teachers"]
@@ -23,6 +24,14 @@ def drop_digits_punctuation_and_space(word):
   word = word.translate(str.maketrans('', '', chars_to_remove))
   return word
 
+def compare_dates(string1, string2, t):
+  if is_anagram(string1, string2): return 0
+  count = 0
+  for i in range(10):
+    if string1[i]!=string2[i]: count+=1
+
+  if count>t: return 1
+  return 0
 
 class NpEncoder(json.JSONEncoder):
   def default(self, obj):
