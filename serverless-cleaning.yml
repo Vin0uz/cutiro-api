@@ -12,4 +12,24 @@ definition:
       Type: Task
       Resource:
         Fn::GetAtt: [trigger, Arn]
+      Next: FirstStep
+    FirstStep:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [first_step, Arn]
+      Next: SecondStep
+    SecondStep:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [second_step, Arn]
+      Next: ThirdStep
+    ThirdStep:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [third_step, Arn]
+      Next: FourthStep
+    FourthStep:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [fourth_step, Arn]
       End: true
