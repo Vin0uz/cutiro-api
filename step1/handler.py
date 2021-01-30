@@ -5,44 +5,27 @@ import json
 import numpy as np
 
 from tqdm import tqdm
+from utils import *
 
 def start(event, context):
-  source_teachers = event["source_teachers"]
-  source_payrolls = event["source_payrolls"]
+  emis, payroll = read_data_from_event(event)
 
-  emis = pd.read_excel(source_teachers, sheet_name = 'EMIS').drop(columns = ['teacher_sex'])
-  payroll = pd.read_excel(source_payrolls, sheet_name = 'Payroll')
-
-  emis = emis[:200]
-  payroll = payroll[:200]
-
-  emis['teacher_name'] = (emis['teacher_name'].apply(drop_digits)).apply(drop_punctuation)
-  emis['teacher_surname'] = (emis['teacher_surname'].apply(drop_digits)).apply(drop_punctuation)
-  payroll['Surname'] = (payroll['Surname'].apply(drop_digits)).apply(drop_punctuation)
-  payroll['First name'] = (payroll['First name'].apply(drop_digits)).apply(drop_punctuation)
+  emis['teacher_name'] = clean_data(emis['teacher_name'])
+  emis['teacher_surname'] = clean_data(emis['teacher_surname'])
+  payroll['Surname'] = clean_data(payroll['Surname'])
+  payroll['First name'] = clean_data(payroll['First name'])
 
   step1, step2 = step_1_and_2(emis, payroll)
 
   response = {
-    "source_teachers": source_teachers,
-    "source_payrolls": source_payrolls,
+    "source_teachers": event["source_teachers"],
+    "source_payrolls": event["source_payrolls"],
     "step1_ids": json.dumps(step1, cls=NpEncoder),
     "step2_ids": json.dumps(step2, cls=NpEncoder)
   }
 
   print(response)
   return response
-
-
-
-## Utils methods
-def drop_digits(word):
-  word = word.translate(str.maketrans('','','0123456789'))
-  return word
-
-def drop_punctuation(word):
-  word = word.translate(str.maketrans('','',string.punctuation))
-  return word.lower()
 
 def mapping_perfect_match(emis, payroll):
   # This method returns a 1:1 matching list
@@ -98,14 +81,3 @@ def step_1_and_2(emis, payroll):
 
 
   return unique_mapping, multiple_mapping
-
-class NpEncoder(json.JSONEncoder):
-  def default(self, obj):
-    if isinstance(obj, np.integer):
-      return int(obj)
-    elif isinstance(obj, np.floating):
-      return float(obj)
-    elif isinstance(obj, np.ndarray):
-      return obj.tolist()
-    else:
-      return super(NpEncoder, self).default(obj)
