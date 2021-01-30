@@ -1,5 +1,7 @@
 from fonctions_step1_step2 import *
+from petites_fonctions_de_scoring import *
 import numpy as np
+from datetime import datetime
 
 def damerau_levenshtein(string1, string2, t):
     '''
@@ -8,8 +10,9 @@ def damerau_levenshtein(string1, string2, t):
     string1 = str(string1)
     string2 = str(string2) # convert dob
 
-    string1 = string1.replace(' ', '')
-    string2 = string2.replace(' ', '')
+    string1 = ''.join(filter(str.isalpha, string1.lower()))
+    string2 = ''.join(filter(str.isalpha, string2.lower())) # keep only letters
+
     if len(string1)==0:
         if string2 =='': return 0
         else: return 1
@@ -37,17 +40,23 @@ def damerau_levenshtein(string1, string2, t):
     if d[len(string1)-1][len(string2)-1] > t: return 1
     return 0
 
+
 def LC_S(string1, string2, t):
     '''
     Computes a distance between strings using the longest common substring
 
     :return: 1 if (len(string1) + len(string2) - 2*result)/(len(string1) + len(string2)) > 1-t, 0 otherwise where result is the length of the longest common substring.
     '''
-    m = len(string1)
-    n = len(string2)
 
     string1 = str(string1)
     string2 = str(string2)
+
+    string1 = ''.join(filter(str.isalpha, string1.lower()))
+    string2 = ''.join(filter(str.isalpha, string2.lower())) # keep only letters
+
+    m = len(string1)
+    n = len(string2)
+
 
     if string1 in string2: return 0
     if string2 in string1: return 0
@@ -76,9 +85,24 @@ def LC_S(string1, string2, t):
 
 def distance(string1, string2, threshold):
     a, b = threshold
+    if string1 in string2 or string2 in string2: return 0
+    if is_anagram(string1, string2): return 0
     if damerau_levenshtein(string1, string2, a) == 0: return 0
     if LC_S(string1, string2, b) == 0: return 0
+    if is_initials(string1, string2): return 0
+    if is_constants_dim(string1, string2): return 0
     return 1
+
+
+def compare_dates(string1, string2, t):
+    if is_anagram(string1, string2): return 0
+    count = 0
+    for i in range(10):
+        if string1[i]!=string2[i]: count+=1
+
+    if count>t: return 1
+    return 0
+
 
 def mapping_forte_similitude(threshold = (2, 0.7)):
     """
@@ -99,8 +123,8 @@ def mapping_forte_similitude(threshold = (2, 0.7)):
             e_id = df_dob._get_value(j, 'Numéro EMIS')
             e_dob = df_dob._get_value(j, 'Date of birth')
 
-            if damerau_levenshtein(p_dob, e_dob, threshold[0]) == 0:
-                res.append((p_id, e_id))
+            if compare_dates(str(p_dob)[:10], str(e_dob)[:10], threshold[0]) == 0:
+                res.append([p_id, e_id])
                 try:
                     t_df_emis = t_df_emis.drop(index=j, inplace=False)
                 except:
@@ -118,7 +142,7 @@ def mapping_forte_similitude(threshold = (2, 0.7)):
             e_surname = df_dob._get_value(j, 'teacher_surname')
 
             if distance(p_surname, e_surname, threshold) == 0 or distance(p_surname, e_clean_surname, threshold) == 0:
-                res.append((p_id, e_id))
+                res.append([p_id, e_id])
                 try:
                     t_df_emis = t_df_emis.drop(index=j, inplace=False)
                 except:
@@ -136,7 +160,7 @@ def mapping_forte_similitude(threshold = (2, 0.7)):
             e_clean_firstname = df_dob._get_value(j, 'clean_teacher_name')
 
             if distance(p_firstname, e_firstname, threshold) == 0 or distance(p_firstname, e_clean_firstname, threshold) == 0:
-                res.append((p_id, e_id))
+                res.append([p_id, e_id])
                 try:
                     t_df_emis = t_df_emis.drop(index=j, inplace=False)
                 except:
@@ -150,3 +174,10 @@ def mapping_forte_similitude(threshold = (2, 0.7)):
 
 
 mapping_90, t_df_emis, t_df_payroll = mapping_forte_similitude()
+
+#for elem in mapping_90[:10]:
+#    b = elem[0]
+#    a = elem[1]
+#    print('****')
+#    print(emis[emis['Numéro EMIS'] == a].values)
+#    print(payroll[payroll['Numéro Solde'] == b].values)
