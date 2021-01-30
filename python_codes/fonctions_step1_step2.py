@@ -24,7 +24,7 @@ emis['teacher_surname'] = (emis['teacher_surname'].apply(drop_digits)).apply(dro
 payroll['Surname'] = (payroll['Surname'].apply(drop_digits)).apply(drop_punctuation)
 payroll['First name'] = (payroll['First name'].apply(drop_digits)).apply(drop_punctuation)
 
-def mapping_for_sure():
+def mapping_correspondance_exacte():
     df_emis = emis.copy()
     df_payroll = payroll.copy()
     res = []
@@ -41,8 +41,41 @@ def mapping_for_sure():
             except: pass
             try: df_payroll = df_payroll.drop(index = i, inplace = False)
             except: pass
-    return res, df_payroll, df_emis
+    return res, df_emis, df_payroll
 
-mapping, df_payroll, df_emis = mapping_for_sure()
 
-print(mapping)
+def step_1_et_2():
+    """
+    Renvoit une liste de correspondances exactes 1:1 entre les deux fichiers
+    """
+    mapping = mapping_correspondance_exacte()[0]
+
+    e_dict = {}
+    p_dict = {}
+
+    for elem in mapping:
+        e, p = elem
+        if e not in e_dict.keys():
+            e_dict[e] = [p]
+        elif p not in e_dict[e]:
+            e_dict[e].append(p)
+
+        if p not in p_dict.keys():
+            p_dict[p] = [e]
+        elif p not in p_dict[p]:
+            p_dict[p].append(e)
+
+    unique_mapping = []
+    multiple_mapping = []
+    for e in e_dict.keys():
+        if len(e_dict[e]) == 1:
+            p = e_dict[e][0]
+            if p_dict[p] == [e]: unique_mapping.append((e, p))
+        else:
+            for p in e_dict[e]:
+                if (e,p) not in multiple_mapping: multiple_mapping.append((e, p))
+                for e_p in p_dict[p]:
+                    if (e_p, p) not in multiple_mapping: multiple_mapping.append((e_p, p))
+
+
+    return unique_mapping, multiple_mapping
