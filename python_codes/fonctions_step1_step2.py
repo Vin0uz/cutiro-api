@@ -18,10 +18,10 @@ def drop_punctuation(word):
     word = word.translate(str.maketrans('','',string.punctuation))
     return word.lower()
 
-emis['teacher_name'] = (emis['teacher_name'].apply(drop_digits)).apply(drop_punctuation)
-emis['teacher_surname'] = (emis['teacher_surname'].apply(drop_digits)).apply(drop_punctuation)
-payroll['Surname'] = (payroll['Surname'].apply(drop_digits)).apply(drop_punctuation)
-payroll['First name'] = (payroll['First name'].apply(drop_digits)).apply(drop_punctuation)
+emis['clean_teacher_name'] = (emis['teacher_name'].apply(drop_digits)).apply(drop_punctuation)
+emis['clean_teacher_surname'] = (emis['teacher_surname'].apply(drop_digits)).apply(drop_punctuation)
+payroll['clean_Surname'] = (payroll['Surname'].apply(drop_digits)).apply(drop_punctuation)
+payroll['clean_First name'] = (payroll['First name'].apply(drop_digits)).apply(drop_punctuation)
 
 def mapping_correspondance_exacte():
     df_emis = emis.copy()
@@ -29,10 +29,10 @@ def mapping_correspondance_exacte():
     res = []
     for i in tqdm(payroll.index):
         p_id = payroll._get_value(i, 'Numéro Solde')
-        surname = payroll._get_value(i, 'Surname')
-        firstname = payroll._get_value(i, 'First name')
+        surname = payroll._get_value(i, 'clean_Surname')
+        firstname = payroll._get_value(i, 'clean_First name')
         dob = payroll._get_value(i, 'Date of birth')
-        df = emis[(emis['teacher_surname'] == surname)&(emis['teacher_name'] == firstname)&(emis['Date of birth'] == dob)]
+        df = emis[(emis['clean_teacher_surname'] == surname)&(emis['clean_teacher_name'] == firstname)&(emis['Date of birth'] == dob)]
         for e_id in df['Numéro EMIS'].unique():
             res.append((p_id, e_id))
             j = df[df['Numéro EMIS'] == e_id].index

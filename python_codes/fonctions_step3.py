@@ -74,6 +74,12 @@ def LC_S(string1, string2, t):
     return 0
 
 
+def distance(string1, string2, threshold):
+    a, b = threshold
+    if damerau_levenshtein(string1, string2, a) == 0: return 0
+    if LC_S(string1, string2, b) == 0: return 0
+    return 1
+
 def mapping_forte_similitude(threshold = (2, 0.7)):
     """
     Retourne la liste des correspondances (simples et multiples) pour lesquelles on est surs à 90%.
@@ -82,13 +88,13 @@ def mapping_forte_similitude(threshold = (2, 0.7)):
     t_df_emis = df_emis.copy()
     t_df_payroll = df_payroll.copy()
     res = []
-    for i in tqdm(payroll.index):
-        p_id = payroll._get_value(i, 'Numéro Solde')
-        p_surname = payroll._get_value(i, 'Surname')
-        p_firstname = payroll._get_value(i, 'First name')
-        p_dob = payroll._get_value(i, 'Date of birth')
+    for i in tqdm(df_payroll.index):
+        p_id = df_payroll._get_value(i, 'Numéro Solde')
+        p_surname = df_payroll._get_value(i, 'clean_Surname')
+        p_firstname = df_payroll._get_value(i, 'clean_First name')
+        p_dob = df_payroll._get_value(i, 'Date of birth')
         ## compare dob:
-        df_dob = emis[(emis['teacher_surname'] == p_surname) & (emis['teacher_name'] == p_firstname)]
+        df_dob = emis[(emis['clean_teacher_surname'] == p_surname) & (emis['clean_teacher_name'] == p_firstname)]
         for j in df_dob.index:
             e_id = df_dob._get_value(j, 'Numéro EMIS')
             e_dob = df_dob._get_value(j, 'Date of birth')
@@ -105,12 +111,13 @@ def mapping_forte_similitude(threshold = (2, 0.7)):
                     pass
 
         ## compare surname:
-        df_dob = emis[(emis['Date of birth'] == p_dob) & (emis['teacher_name'] == p_firstname)]
+        df_dob = emis[(emis['Date of birth'] == p_dob) & (emis['clean_teacher_name'] == p_firstname)]
         for j in df_dob.index:
             e_id = df_dob._get_value(j, 'Numéro EMIS')
+            e_clean_surname = df_dob._get_value(j, 'clean_teacher_surname')
             e_surname = df_dob._get_value(j, 'teacher_surname')
 
-            if damerau_levenshtein(p_surname, e_surname, threshold[0]) == 0 or LC_S(p_surname, e_surname, threshold[1]) == 0:
+            if distance(p_surname, e_surname, threshold) == 0 or distance(p_surname, e_clean_surname, threshold) == 0:
                 res.append((p_id, e_id))
                 try:
                     t_df_emis = t_df_emis.drop(index=j, inplace=False)
@@ -122,12 +129,13 @@ def mapping_forte_similitude(threshold = (2, 0.7)):
                     pass
 
         ## compare firstname:
-        df_dob = emis[(emis['Date of birth'] == p_dob) & (emis['teacher_surname'] == p_surname)]
+        df_dob = emis[(emis['Date of birth'] == p_dob) & (emis['clean_teacher_surname'] == p_surname)]
         for j in df_dob.index:
             e_id = df_dob._get_value(j, 'Numéro EMIS')
             e_firstname = df_dob._get_value(j, 'teacher_name')
+            e_clean_firstname = df_dob._get_value(j, 'clean_teacher_name')
 
-            if damerau_levenshtein(p_firstname, e_firstname, threshold[0]) == 0 or LC_S(p_firstname, e_firstname, threshold[1]) == 0:
+            if distance(p_firstname, e_firstname, threshold) == 0 or distance(p_firstname, e_clean_firstname, threshold) == 0:
                 res.append((p_id, e_id))
                 try:
                     t_df_emis = t_df_emis.drop(index=j, inplace=False)
