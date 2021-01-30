@@ -35,3 +35,5 @@ plugins:
   - serverless-step-functions
   - serverless-python-requirements
   - serverless-dotenv-plugin
+
+# Note: Docker is required to run python-requirements properly
