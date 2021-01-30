@@ -1,15 +1,29 @@
 service: cutiro-api
+app: cutiro-api
+org: vin0uz
 
 provider:
   name: aws
   runtime: python3.7
   region: eu-west-3
   profile: cutiro
+  logs:
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - cloudwatch:*
+        - logs:*
+      Resource:
+        - "*"
 
 functions:
-  start:
-    handler: handler.endpoint
-    events:
-      - http:
-          path: cleaning/start
-          method: get
+  trigger:
+    handler : handler.endpoint
+
+stepFunctions:
+  stateMachines:
+    cleaning:
+      ${file(serverless-cleaning.yml)}
+
+plugins:
+  - serverless-step-functions
