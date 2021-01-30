@@ -3,8 +3,8 @@ from tqdm import tqdm
 import re
 import string
 
-emis = pd.read_excel('Namibia teachers data for Hackathon.xlsx', sheet_name = 'EMIS').drop(columns = ['teacher_sex'])
-payroll = pd.read_excel('Namibia teachers data for Hackathon.xlsx', sheet_name = 'Payroll')
+emis = pd.read_excel('fixtures/Namibia_teachers_data_for_Hackathon.xlsx', sheet_name = 'EMIS').drop(columns = ['teacher_sex'])
+payroll = pd.read_excel('fixtures/Namibia_teachers_data_for_Hackathon.xlsx', sheet_name = 'Payroll')
 
 emis = emis[:200]
 payroll = payroll[:200]
@@ -42,6 +42,4 @@ def mapping_for_sure():
             except: pass
     return res, df_payroll, df_emis
 
-mapping, df_payroll, df_emis = mapping_for_sure()
 
-print(mapping)
