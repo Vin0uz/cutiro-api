@@ -7,14 +7,11 @@ provider:
   runtime: python3.7
   region: eu-west-3
   profile: cutiro
-  logs:
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - cloudwatch:*
-        - logs:*
-      Resource:
-        - "*"
+  timeout: 120
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
 
 functions:
   trigger:
@@ -36,3 +33,5 @@ stepFunctions:
 
 plugins:
   - serverless-step-functions
+  - serverless-python-requirements
+  - serverless-dotenv-plugin
