@@ -1,13 +1,7 @@
 import json
 
 def endpoint(event, context):
-    body = {
-      "message": "Hello, World"
-    }
+  source_teachers = event["source_teachers"]
+  source_payrolls = event["source_payrolls"]
 
-    response = {
-      "statusCode": 200,
-      "body": json.dumps(body)
-    }
-
-    return response
+  return { "source_teachers": source_teachers, "source_payrolls": source_payrolls }
