@@ -114,11 +114,11 @@ def mapping_forte_similitude(threshold = (2, 0.7)):
     res = []
     for i in tqdm(df_payroll.index):
         p_id = df_payroll._get_value(i, 'Numéro Solde')
-        p_surname = df_payroll._get_value(i, 'clean_Surname')
-        p_firstname = df_payroll._get_value(i, 'clean_First name')
+        p_surname = df_payroll._get_value(i, 'clean_surname')
+        p_firstname = df_payroll._get_value(i, 'clean_name')
         p_dob = df_payroll._get_value(i, 'Date of birth')
         ## compare dob:
-        df_dob = emis[(emis['clean_teacher_surname'] == p_surname) & (emis['clean_teacher_name'] == p_firstname)]
+        df_dob = emis[(emis['clean_surname'] == p_surname) & (emis['clean_name'] == p_firstname)]
         for j in df_dob.index:
             e_id = df_dob._get_value(j, 'Numéro EMIS')
             e_dob = df_dob._get_value(j, 'Date of birth')
@@ -135,10 +135,10 @@ def mapping_forte_similitude(threshold = (2, 0.7)):
                     pass
 
         ## compare surname:
-        df_dob = emis[(emis['Date of birth'] == p_dob) & (emis['clean_teacher_name'] == p_firstname)]
+        df_dob = emis[(emis['Date of birth'] == p_dob) & (emis['clean_name'] == p_firstname)]
         for j in df_dob.index:
             e_id = df_dob._get_value(j, 'Numéro EMIS')
-            e_clean_surname = df_dob._get_value(j, 'clean_teacher_surname')
+            e_clean_surname = df_dob._get_value(j, 'clean_surname')
             e_surname = df_dob._get_value(j, 'teacher_surname')
 
             if distance(p_surname, e_surname, threshold) == 0 or distance(p_surname, e_clean_surname, threshold) == 0:
@@ -153,11 +153,11 @@ def mapping_forte_similitude(threshold = (2, 0.7)):
                     pass
 
         ## compare firstname:
-        df_dob = emis[(emis['Date of birth'] == p_dob) & (emis['clean_teacher_surname'] == p_surname)]
+        df_dob = emis[(emis['Date of birth'] == p_dob) & (emis['clean_surname'] == p_surname)]
         for j in df_dob.index:
             e_id = df_dob._get_value(j, 'Numéro EMIS')
             e_firstname = df_dob._get_value(j, 'teacher_name')
-            e_clean_firstname = df_dob._get_value(j, 'clean_teacher_name')
+            e_clean_firstname = df_dob._get_value(j, 'clean_name')
 
             if distance(p_firstname, e_firstname, threshold) == 0 or distance(p_firstname, e_clean_firstname, threshold) == 0:
                 res.append([p_id, e_id])

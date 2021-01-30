@@ -3,8 +3,8 @@ from tqdm import tqdm
 import re
 import string
 
-emis = pd.read_excel('fixtures/Namibia_teachers_data_for_Hackathon.xlsx', sheet_name = 'EMIS').drop(columns = ['teacher_sex'])
-payroll = pd.read_excel('fixtures/Namibia_teachers_data_for_Hackathon.xlsx', sheet_name = 'Payroll')
+emis = pd.read_excel('../fixtures/Namibia_teachers_data_for_Hackathon.xlsx', sheet_name = 'EMIS').drop(columns = ['teacher_sex'])
+payroll = pd.read_excel('../fixtures/Namibia_teachers_data_for_Hackathon.xlsx', sheet_name = 'Payroll')
 
 
 emis = emis[:200]
@@ -19,10 +19,10 @@ def drop_punctuation(word):
     word = word.translate(str.maketrans('','',string.punctuation))
     return word.lower()
 
-emis['clean_teacher_name'] = (emis['teacher_name'].apply(drop_digits)).apply(drop_punctuation)
-emis['clean_teacher_surname'] = (emis['teacher_surname'].apply(drop_digits)).apply(drop_punctuation)
-payroll['clean_Surname'] = (payroll['Surname'].apply(drop_digits)).apply(drop_punctuation)
-payroll['clean_First name'] = (payroll['First name'].apply(drop_digits)).apply(drop_punctuation)
+emis['clean_name'] = (emis['teacher_name'].apply(drop_digits)).apply(drop_punctuation)
+emis['clean_surname'] = (emis['teacher_surname'].apply(drop_digits)).apply(drop_punctuation)
+payroll['clean_surname'] = (payroll['Surname'].apply(drop_digits)).apply(drop_punctuation)
+payroll['clean_name'] = (payroll['First name'].apply(drop_digits)).apply(drop_punctuation)
 
 def mapping_correspondance_exacte():
     df_emis = emis.copy()
@@ -30,10 +30,10 @@ def mapping_correspondance_exacte():
     res = []
     for i in tqdm(payroll.index):
         p_id = payroll._get_value(i, 'Numéro Solde')
-        surname = payroll._get_value(i, 'clean_Surname')
-        firstname = payroll._get_value(i, 'clean_First name')
+        surname = payroll._get_value(i, 'clean_surname')
+        firstname = payroll._get_value(i, 'clean_name')
         dob = payroll._get_value(i, 'Date of birth')
-        df = emis[(emis['clean_teacher_surname'] == surname)&(emis['clean_teacher_name'] == firstname)&(emis['Date of birth'] == dob)]
+        df = emis[(emis['clean_surname'] == surname)&(emis['clean_name'] == firstname)&(emis['Date of birth'] == dob)]
         for e_id in df['Numéro EMIS'].unique():
             res.append([p_id, e_id])
             j = df[df['Numéro EMIS'] == e_id].index
