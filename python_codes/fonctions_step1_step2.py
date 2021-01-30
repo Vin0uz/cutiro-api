@@ -34,7 +34,7 @@ def mapping_correspondance_exacte():
         dob = payroll._get_value(i, 'Date of birth')
         df = emis[(emis['clean_teacher_surname'] == surname)&(emis['clean_teacher_name'] == firstname)&(emis['Date of birth'] == dob)]
         for e_id in df['Numéro EMIS'].unique():
-            res.append((p_id, e_id))
+            res.append([p_id, e_id])
             j = df[df['Numéro EMIS'] == e_id].index
             try: df_emis = df_emis.drop(index = j, inplace = False)
             except: pass
@@ -68,12 +68,12 @@ def step_1_et_2():
     for e in e_dict.keys():
         if len(e_dict[e]) == 1:
             p = e_dict[e][0]
-            if p_dict[p] == [e]: unique_mapping.append((e, p))
+            if p_dict[p] == [e]: unique_mapping.append([e, p])
         else:
             for p in e_dict[e]:
-                if (e,p) not in multiple_mapping: multiple_mapping.append((e, p))
+                if [e,p] not in multiple_mapping: multiple_mapping.append([e, p])
                 for e_p in p_dict[p]:
-                    if (e_p, p) not in multiple_mapping: multiple_mapping.append((e_p, p))
+                    if [e_p, p] not in multiple_mapping: multiple_mapping.append([e_p, p])
 
 
     return unique_mapping, multiple_mapping
