@@ -16,15 +16,13 @@ def read_data_from_event(event):
   return emis, payroll
 
 def clean_data(data):
-  return data.apply(drop_digits).apply(drop_punctuation)
+  return data.apply(drop_digits_punctuation_and_space)
 
-def drop_digits(word):
-  word = word.translate(str.maketrans('','','0123456789'))
+def drop_digits_punctuation_and_space(word):
+  chars_to_remove = string.punctuation + '0123456789' + ' '
+  word = word.translate(str.maketrans('', '', chars_to_remove))
   return word
 
-def drop_punctuation(word):
-  word = word.translate(str.maketrans('','',string.punctuation))
-  return word.lower()
 
 class NpEncoder(json.JSONEncoder):
   def default(self, obj):
