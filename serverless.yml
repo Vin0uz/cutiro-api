@@ -1,0 +1,15 @@
+service: cutiro-api
+
+provider:
+  name: aws
+  runtime: python3.7
+  region: eu-west-3
+  profile: cutiro
+
+functions:
+  start:
+    handler: handler.endpoint
+    events:
+      - http:
+          path: cleaning/start
+          method: get
