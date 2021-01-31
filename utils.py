@@ -29,9 +29,9 @@ def filter_payroll_with_previous_matches(payroll, event):
       payroll = payroll.drop(removed)
   # Remove matched teachers
   for i in range(1, 5):
-    if f"step{i}" in event:
-      # event['step{i}'] contains a map of pay_id -> emis_id => Collect all pay_ids
-      pay_ids = np.array(json.loads(event[f"step{i}"]))[:, 0]
+    if f"step{i}_ids" in event:
+      # event['step{i}_ids'] contains a map of pay_id -> emis_id => Collect all pay_ids
+      pay_ids = np.array(json.loads(event[f"step{i}_ids"]))[:, 0]
       payroll = payroll.drop(pay_ids)
   return payroll
 
@@ -87,10 +87,10 @@ def previous_matches_df(payroll, emis, event):
   # Matched teachers
   cols = ['Match certain', 'Matchs certains', 'Matchs confiants', 'Matchs possibles']
   for i in range(1, 5):
-    if f"step{i}" in event:
+    if f"step{i}_ids" in event:
       name = cols[i - 1]
       # contains a map of pay_id -> emis_id => Group by pay_id and collect the list of all matching emis_ids
-      matchs_series = pd.DataFrame(json.loads(event[f'step{i}']), columns=["Numéro Solde", name]).groupby('Numéro Solde')[name].apply(list)
+      matchs_series = pd.DataFrame(json.loads(event[f'step{i}_ids']), columns=["Numéro Solde", name]).groupby('Numéro Solde')[name].apply(list)
       payroll = payroll.join(matchs_series)
   # Convert list of IDs to nice display
   emis = emis.set_index('Numéro EMIS')  # For faster matching
