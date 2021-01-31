@@ -8,8 +8,14 @@ provider:
   region: eu-west-3
   profile: cutiro
   timeout: 120
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:PutObject"
+      Resource: "arn:aws:s3:::${self:custom.bucket}/*"
 
 custom:
+  bucket: "vinouz"
   pythonRequirements:
     dockerizePip: non-linux
 
@@ -24,7 +30,6 @@ functions:
     handler : step3/handler.start
   fourth_step:
     handler : step4/handler.start
-
 
 stepFunctions:
   stateMachines:
