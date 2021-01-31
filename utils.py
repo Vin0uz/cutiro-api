@@ -3,6 +3,7 @@ import pandas as pd
 import string
 import numpy as np
 from scoring import is_anagram
+import boto3
 
 def read_data_from_event(event):
   source_teachers = event["source_teachers"]
@@ -51,6 +52,14 @@ def compare_dates(string1, string2, t):
 
   if count>t: return 1
   return 0
+
+def save_excel_on_s3(source = "test.xlsx", destination = "test.xlsx"):
+  s3 = boto3.resource(u's3')
+  bucket = s3.Bucket(u'vinouz')
+  bucket.upload_file(source, destination, ExtraArgs={'ACL':'public-read'})
+
+  object_url = "https://vinouz.s3-eu-west-1.amazonaws.com/{0}".format(destination)
+  return object_url
 
 class NpEncoder(json.JSONEncoder):
   def default(self, obj):
