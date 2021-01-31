@@ -120,9 +120,10 @@ def ids_to_details(ids, emis):
 
 
 def output_excels(payroll, emis, event, filepath):
-  with pd.ExcelWriter(filepath) as writer:
-    enriched_payroll = previous_matches_df(payroll, emis, event)
-    print(enriched_payroll)
-    enriched_payroll.to_excel(writer, index=False, sheet_name='Payroll')
-    print(emis)
-    emis.to_excel(writer, index=False, sheet_name='EMIS')
+  enriched_payroll = previous_matches_df(payroll, emis, event)
+  print(enriched_payroll)
+  print(emis)
+  enriched_payroll.to_excel(filepath, index=False)
+  # with pd.ExcelWriter(filepath) as writer:
+  #   print(emis)
+  #   emis.to_excel(writer, index=False, sheet_name='EMIS')
