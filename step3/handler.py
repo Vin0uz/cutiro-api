@@ -14,6 +14,7 @@ def start(event, context):
   mapping, t_df_emis, t_df_payroll = low_similary_match(emis, payroll)
 
   response = {
+    "id": event["id"],
     "source_teachers": event["source_teachers"],
     "source_payrolls": event["source_payrolls"],
     "step1_ids": event["step1_ids"],
