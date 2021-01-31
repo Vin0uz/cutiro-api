@@ -62,3 +62,25 @@ class NpEncoder(json.JSONEncoder):
       return obj.tolist()
     else:
       return super(NpEncoder, self).default(obj)
+
+
+def previous_matches_df(payroll, event):
+  # Reset index for faster deletions
+  payroll = payroll.set_index('Numéro Solde', drop=False)
+  # Remove duplicates from payroll
+  if 'payroll_duplicates' in event:
+    # Drop matched duplicates
+    for _, removed in event['payroll_duplicates']:
+      payroll = payroll.drop(removed)
+  # Convert matches to Series and left join them
+  duplicates = pd.Series(event['payroll_duplicates'], name="Duplicats de Payroll")
+  payroll = payroll.join(duplicates)
+  # Matched teachers
+  cols = ['', 'Matchs certains', 'Matchs confiants', 'Matchs possibles', 'Ghost teachers']
+  for i in range(1, 5):
+    if f"step{i}" in event:
+      name = cols[i]
+      #  contains a map of pay_id -> emis_id => Collect all pay_ids
+      matchs_series = pd.DataFrame(event[f'step{i}'], columns=["Numéro Solde", name]).set_index("Numéro Solde")[name]
+      payroll = payroll.join(matchs_series)
+  return payroll
