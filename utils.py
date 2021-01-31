@@ -10,11 +10,30 @@ def read_data_from_event(event):
 
   emis = pd.read_excel(source_teachers, sheet_name = 'EMIS').drop(columns = ['teacher_sex'])
   payroll = pd.read_excel(source_payrolls, sheet_name = 'Payroll')
+  payroll = filter_payroll_with_previous_matches(payroll, event)
 
   emis = emis[:200]
   payroll = payroll[:200]
 
   return emis, payroll
+
+
+def filter_payroll_with_previous_matches(payroll, event):
+  # Reset index for faster deletions
+  payroll = payroll.set_index('Numéro Solde', drop=False)
+  # Remove duplicates from payroll
+  if 'payroll_duplicates' in event:
+    # Drop matched duplicates
+    for _, removed in event['payroll_duplicates']:
+      payroll = payroll.drop(removed)
+  # Remove matched teachers
+  for i in range(1, 5):
+    if f"step{i}" in event:
+      # event['step{i}'] contains a map of pay_id -> emis_id => Collect all pay_ids
+      pay_ids = np.array(event[f"step{i}"])[:, 0]
+      payroll = payroll.drop(pay_ids)
+  return payroll
+
 
 def clean_data(data):
   return data.apply(drop_digits_punctuation_and_space)

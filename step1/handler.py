@@ -20,6 +20,7 @@ def start(event, context):
   response = {
     "source_teachers": event["source_teachers"],
     "source_payrolls": event["source_payrolls"],
+    "payroll_duplicates": event["payroll_duplicates"],
     "step1_ids": json.dumps(step1, cls=NpEncoder),
     "step2_ids": json.dumps(step2, cls=NpEncoder)
   }
