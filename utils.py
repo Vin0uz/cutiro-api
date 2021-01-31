@@ -84,3 +84,9 @@ def previous_matches_df(payroll, event):
       matchs_series = pd.DataFrame(event[f'step{i}'], columns=["Numéro Solde", name]).set_index("Numéro Solde")[name]
       payroll = payroll.join(matchs_series)
   return payroll
+
+
+def output_excels(payroll, emis, event, filepath):
+    with pd.ExcelWriter(filepath) as writer:
+        previous_matches_df(payroll, event).to_excel(writer, index=False, sheet_name='Payroll')
+        emis.to_excel(writer, index=False, sheet_name='EMIS')
