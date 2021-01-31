@@ -93,6 +93,7 @@ def previous_matches_df(payroll, emis, event):
       matchs_series = pd.DataFrame(json.loads(event[f'step{i}']), columns=["Numéro Solde", name]).groupby('Numéro Solde')[name].apply(list)
       payroll = payroll.join(matchs_series)
   # Convert list of IDs to nice display
+  emis = emis.set_index('Numéro EMIS')  # For faster matching
   for col in cols:
       payroll[col] = payroll[col].apply(lambda l: ids_to_details(l, emis))
   # Ghosts teachers
@@ -107,7 +108,6 @@ def previous_matches_df(payroll, emis, event):
 
 def ids_to_details(ids, emis):
     details = []
-    emis = emis.set_index('Numéro EMIS')  # For faster matching
     if type(ids) == float:  # As some rows will have pd.nan -> float
       return ""
     else:
@@ -124,4 +124,5 @@ def output_excels(payroll, emis, event, filepath):
     enriched_payroll = previous_matches_df(payroll, emis, event)
     print(enriched_payroll)
     enriched_payroll.to_excel(writer, index=False, sheet_name='Payroll')
+    print(emis)
     emis.to_excel(writer, index=False, sheet_name='EMIS')
