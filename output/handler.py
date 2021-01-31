@@ -27,7 +27,7 @@ def start(event, context):
   url = "https://cutiro.herokuapp.com/cleaning"
   myResponse = requests.post(url, data = response)
   if(myResponse.ok):
-    print "API call was ok"
+    print("API call was ok")
   else:
     myResponse.raise_for_status()
 
