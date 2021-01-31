@@ -17,6 +17,7 @@ def start(event, context):
     "batch_id": event["batch_id"],
     "source_teachers": event["source_teachers"],
     "source_payrolls": event["source_payrolls"],
+    "payroll_duplicates": event["payroll_duplicates"],
     "step1_ids": event["step1_ids"],
     "step2_ids": event["step2_ids"],
     "step3_ids": event["step3_ids"],
