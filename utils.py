@@ -9,7 +9,7 @@ def read_data_from_event(event):
   source_teachers = event["source_teachers"]
   source_payrolls = event["source_payrolls"]
 
-  emis = pd.read_excel(source_teachers, sheet_name = 'EMIS').drop(columns = ['teacher_sex'])
+  emis = pd.read_excel(source_teachers, sheet_name = 'EMIS')
   payroll = pd.read_excel(source_payrolls, sheet_name = 'Payroll')
   payroll = filter_payroll_with_previous_matches(payroll, event)
 
