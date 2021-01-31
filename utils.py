@@ -90,7 +90,9 @@ def previous_matches_df(payroll, event):
 
 def output_excels(payroll, emis, event):
     f = io.BytesIO()
-    with pd.ExcelWriter(f) as writer:
-        previous_matches_df(payroll, event).to_excel(writer, index=False, sheet_name='Payroll')
-        emis.to_excel(writer, index=False, sheet_name='EMIS')
+    writer = pd.ExcelWriter(f)
+    previous_matches_df(payroll, event).to_excel(writer, index=False, sheet_name='Payroll')
+    emis.to_excel(writer, index=False, sheet_name='EMIS')
+    writer.save()
+    f.seek(0)
     return f
