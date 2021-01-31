@@ -9,12 +9,14 @@ def start(event, context):
       "source_payrolls": event["source_payrolls"]
   })
 
-  filepath = f'./{uuid.uuid1()}.xlsx'
+  filename = f'/tmp/{uuid.uuid1()}.xlsx'
+  filepath = f'/tmp/{filename}'
   output_excels(payroll, emis, event, filepath)
-  # ToDo @VinOuz: store in S3 bucket and return the URL
+
+  file_url = save_excel_on_s3(filepath, filename)
 
   response = {
-    "filepath": filepath
+    "file_url": file_url
   }
 
   print(response)
