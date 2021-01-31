@@ -73,7 +73,7 @@ class NpEncoder(json.JSONEncoder):
       return super(NpEncoder, self).default(obj)
 
 
-def previous_matches_df(payroll, event):
+def previous_matches_df(payroll, emis, event):
   # Reset index for faster deletions
   payroll = payroll.set_index('Numéro Solde', drop=False)
   # Remove duplicates from payroll
@@ -85,17 +85,31 @@ def previous_matches_df(payroll, event):
   duplicates = pd.Series(event['payroll_duplicates'], name="Duplicats de Payroll")
   payroll = payroll.join(duplicates)
   # Matched teachers
-  cols = ['', 'Matchs certains', 'Matchs confiants', 'Matchs possibles', 'Ghost teachers']
+  cols = ['Matchs certains', 'Matchs confiants', 'Matchs possibles', 'Ghost teachers']
   for i in range(1, 5):
     if f"step{i}" in event:
       name = cols[i]
       #  contains a map of pay_id -> emis_id => Group by pay_id and collect the list of all matching emis_ids
-      matchs_series = pd.DataFrame(event[f'step{i}'], columns=["Numéro Solde", name]).groupby('Numéro Solde')[name].apply(list)
+      matchs_series = pd.DataFrame(event[f'step{i - 1}'], columns=["Numéro Solde", name]).groupby('Numéro Solde')[name].apply(list)
       payroll = payroll.join(matchs_series)
+  # Convert list of IDs to nice display
+  for col in cols:
+    payroll[col].apply(lambda l: ids_to_details(l, emis))
   return payroll
+
+
+def ids_to_details(ids, emis):
+    details = []
+    emis = emis.set_index('Numéro EMIS')  # For faster matching
+    for e_id in ids:
+        row = emis.iloc[e_id]
+        birth = "né" if row['teacher_sex'] == 'Male' else 'née'
+        details.append(f"{row['teacher_name']} {row['teacher_surname']}, "
+                       f"{birth} le {row['Date of birth'].strftime('%d-%m-%Y')} (EMIS ID #{e_id})")
+    return ", ".join(details)
 
 
 def output_excels(payroll, emis, event, filepath):
     with pd.ExcelWriter(filepath) as writer:
-        previous_matches_df(payroll, event).to_excel(writer, index=False, sheet_name='Payroll')
+        previous_matches_df(payroll, emis, event).to_excel(writer, index=False, sheet_name='Payroll')
         emis.to_excel(writer, index=False, sheet_name='EMIS')
