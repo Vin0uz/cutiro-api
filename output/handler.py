@@ -1,6 +1,8 @@
 from utils import *
 import uuid
-
+import requests
+from requests.auth import HTTPDigestAuth
+import json
 
 def start(event, context):
   # Collect data with no filtering based on previous matches
@@ -16,9 +18,17 @@ def start(event, context):
   file_url = save_excel_on_s3(filepath, filename)
 
   response = {
-    "batch_id": event["batch_id"],
-    "file_url": file_url
+    "cleaning": {
+      "result_url": file_url,
+      "id": event["batch_id"]
+    }
   }
 
-  print(response)
+  url = "https://cutiro.herokuapp.com/cleaning"
+  myResponse = requests.post(url, data = response)
+  if(myResponse.ok):
+    print "API call was ok"
+  else:
+    myResponse.raise_for_status()
+
   return response
