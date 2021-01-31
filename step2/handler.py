@@ -16,6 +16,7 @@ def start(event, context):
   mapping_90, t_df_emis, t_df_payroll = high_similary_match(emis, payroll)
 
   response = {
+    "batch_id": event["batch_id"],
     "source_teachers": event["source_teachers"],
     "source_payrolls": event["source_payrolls"],
     "payroll_duplicates": event["payroll_duplicates"],

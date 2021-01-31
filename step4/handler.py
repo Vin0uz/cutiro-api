@@ -7,6 +7,7 @@ def start(event, context):
   ghosts = list(payroll['Numéro Solde'])
 
   response = {
+    "batch_id": event["batch_id"],
     "source_teachers": event["source_teachers"],
     "source_payrolls": event["source_payrolls"],
     "payroll_duplicates": event["payroll_duplicates"],
