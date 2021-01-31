@@ -31,7 +31,7 @@ def filter_payroll_with_previous_matches(payroll, event):
   for i in range(1, 5):
     if f"step{i}" in event:
       # event['step{i}'] contains a map of pay_id -> emis_id => Collect all pay_ids
-      pay_ids = np.array(event[f"step{i}"])[:, 0]
+      pay_ids = np.array(json.loads(event[f"step{i}"]))[:, 0]
       payroll = payroll.drop(pay_ids)
   return payroll
 
@@ -90,16 +90,16 @@ def previous_matches_df(payroll, emis, event):
     if f"step{i}" in event:
       name = cols[i - 1]
       # contains a map of pay_id -> emis_id => Group by pay_id and collect the list of all matching emis_ids
-      matchs_series = pd.DataFrame(event[f'step{i}'], columns=["Numéro Solde", name]).groupby('Numéro Solde')[name].apply(list)
+      matchs_series = pd.DataFrame(json.loads(event[f'step{i}']), columns=["Numéro Solde", name]).groupby('Numéro Solde')[name].apply(list)
       payroll = payroll.join(matchs_series)
   # Convert list of IDs to nice display
   for col in cols:
       payroll[col] = payroll[col].apply(lambda l: ids_to_details(l, emis))
   # Ghosts teachers
   ghosts = pd.Series(
-    ['Oui' for _ in range(len(event['ghosts']))],
+    ['Oui' for _ in range(len(json.loads(event['ghosts'])))],
     name='Professeurs fantômes',
-    index=pd.Index(event['ghosts'])
+    index=pd.Index(json.loads(event['ghosts']))
   )
   payroll = payroll.join(ghosts)
   return payroll
@@ -120,7 +120,8 @@ def ids_to_details(ids, emis):
 
 
 def output_excels(payroll, emis, event, filepath):
-    with pd.ExcelWriter(filepath) as writer:
-        enriched_payroll = previous_matches_df(payroll, emis, event)
-        enriched_payroll.to_excel(writer, index=False, sheet_name='Payroll')
-        emis.to_excel(writer, index=False, sheet_name='EMIS')
+  with pd.ExcelWriter(filepath) as writer:
+    enriched_payroll = previous_matches_df(payroll, emis, event)
+    print(enriched_payroll)
+    enriched_payroll.to_excel(writer, index=False, sheet_name='Payroll')
+    emis.to_excel(writer, index=False, sheet_name='EMIS')
