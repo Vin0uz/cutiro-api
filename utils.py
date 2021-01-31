@@ -9,12 +9,12 @@ def read_data_from_event(event):
   source_teachers = event["source_teachers"]
   source_payrolls = event["source_payrolls"]
 
-  emis = pd.read_excel(source_teachers, sheet_name = 'EMIS').drop(columns = ['teacher_sex'])
-  payroll = pd.read_excel(source_payrolls, sheet_name = 'Payroll')
+  emis = pd.read_excel(source_teachers, sheet_name = 'EMIS', engine='openpyxl',)
+  payroll = pd.read_excel(source_payrolls, sheet_name = 'Payroll', engine='openpyxl',)
   payroll = filter_payroll_with_previous_matches(payroll, event)
 
-  emis = emis[:200]
-  payroll = payroll[:200]
+  emis = emis
+  payroll = payroll
 
   return emis, payroll
 
@@ -29,10 +29,12 @@ def filter_payroll_with_previous_matches(payroll, event):
       payroll = payroll.drop(removed)
   # Remove matched teachers
   for i in range(1, 5):
-    if f"step{i}" in event:
-      # event['step{i}'] contains a map of pay_id -> emis_id => Collect all pay_ids
-      pay_ids = np.array(json.loads(event[f"step{i}"]))[:, 0]
-      payroll = payroll.drop(pay_ids)
+    if f"step{i}_ids" in event:
+      # event['step{i}_ids'] contains a map of pay_id -> emis_id => Collect all pay_ids
+      ids = np.array(json.loads(event[f"step{i}_ids"]))
+      if len(ids) > 0:
+          pay_ids = ids[:, 0]
+          payroll = payroll.drop(pay_ids)
   return payroll
 
 
@@ -87,10 +89,10 @@ def previous_matches_df(payroll, emis, event):
   # Matched teachers
   cols = ['Match certain', 'Matchs certains', 'Matchs confiants', 'Matchs possibles']
   for i in range(1, 5):
-    if f"step{i}" in event:
+    if f"step{i}_ids" in event:
       name = cols[i - 1]
       # contains a map of pay_id -> emis_id => Group by pay_id and collect the list of all matching emis_ids
-      matchs_series = pd.DataFrame(json.loads(event[f'step{i}']), columns=["Numéro Solde", name]).groupby('Numéro Solde')[name].apply(list)
+      matchs_series = pd.DataFrame(json.loads(event[f'step{i}_ids']), columns=["Numéro Solde", name]).groupby('Numéro Solde')[name].apply(list)
       payroll = payroll.join(matchs_series)
   # Convert list of IDs to nice display
   emis = emis.set_index('Numéro EMIS')  # For faster matching
@@ -112,7 +114,7 @@ def ids_to_details(ids, emis):
       return ""
     else:
       for e_id in ids:
-          row = emis.iloc[e_id]
+          row = emis.loc[e_id]
           birth = "né" if row['teacher_sex'] == 'Male' else 'née'
           details.append(f"{row['teacher_name']} {row['teacher_surname']}, "
                          f"{birth} le {row['Date of birth'].strftime('%d-%m-%Y')} (EMIS ID #{e_id})")
@@ -121,8 +123,6 @@ def ids_to_details(ids, emis):
 
 def output_excels(payroll, emis, event, filepath):
   enriched_payroll = previous_matches_df(payroll, emis, event)
-  print(enriched_payroll)
-  print(emis)
   enriched_payroll.to_excel(filepath, index=False)
   # with pd.ExcelWriter(filepath) as writer:
   #   print(emis)

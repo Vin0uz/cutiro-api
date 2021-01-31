@@ -4,3 +4,5 @@ openpyxl
 numpy
 datetime
 requests
+boto3
+xlrd
