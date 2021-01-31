@@ -85,16 +85,23 @@ def previous_matches_df(payroll, emis, event):
   duplicates = pd.Series(event['payroll_duplicates'], name="Duplicats de Payroll")
   payroll = payroll.join(duplicates)
   # Matched teachers
-  cols = ['Matchs certains', 'Matchs confiants', 'Matchs possibles', 'Ghost teachers']
+  cols = ['Match certain', 'Matchs certains', 'Matchs confiants', 'Matchs possibles']
   for i in range(1, 5):
     if f"step{i}" in event:
       name = cols[i]
-      #  contains a map of pay_id -> emis_id => Group by pay_id and collect the list of all matching emis_ids
+      # contains a map of pay_id -> emis_id => Group by pay_id and collect the list of all matching emis_ids
       matchs_series = pd.DataFrame(event[f'step{i - 1}'], columns=["Numéro Solde", name]).groupby('Numéro Solde')[name].apply(list)
       payroll = payroll.join(matchs_series)
   # Convert list of IDs to nice display
   for col in cols:
     payroll[col].apply(lambda l: ids_to_details(l, emis))
+  # Ghosts teachers
+  ghosts = pd.Series(
+    ['Oui' for _ in range(len(event['ghosts']))],
+    name='Professeurs fantômes',
+    index=pd.Index(event['ghosts'])
+  )
+  payroll = payroll.join(ghosts)
   return payroll
 
 
