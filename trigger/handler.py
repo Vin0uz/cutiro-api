@@ -20,7 +20,7 @@ def endpoint(event, context):
   )
 
   payroll_duplicates = []
-  for _, duplicate_ids in duplicate_teachers(payroll):
+  for _, duplicate_ids in duplicate_teachers(payroll).items():
       payroll_duplicates.append([duplicate_ids[0], duplicate_ids[1:]])
 
   response = {
