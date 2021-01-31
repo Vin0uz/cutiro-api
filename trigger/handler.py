@@ -24,6 +24,7 @@ def endpoint(event, context):
       payroll_duplicates.append([duplicate_ids[0], duplicate_ids[1:]])
 
   response = {
+    "id": event["id"],
     "source_teachers": event["source_teachers"],
     "source_payrolls": event["source_payrolls"],
     "payroll_duplicates": payroll_duplicates
