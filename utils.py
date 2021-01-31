@@ -9,12 +9,12 @@ def read_data_from_event(event):
   source_teachers = event["source_teachers"]
   source_payrolls = event["source_payrolls"]
 
-  emis = pd.read_excel(source_teachers, sheet_name = 'EMIS', engine='openpyxl',)
-  payroll = pd.read_excel(source_payrolls, sheet_name = 'Payroll', engine='openpyxl',)
+  emis = pd.read_excel(source_teachers, sheet_name = 'EMIS', engine='openpyxl')
+  payroll = pd.read_excel(source_payrolls, sheet_name = 'Payroll', engine='openpyxl')
   payroll = filter_payroll_with_previous_matches(payroll, event)
 
-  emis = emis[200:]
-  payroll = payroll[200:]
+  emis = emis[:200]
+  payroll = payroll[:200]
 
   return emis, payroll
 
