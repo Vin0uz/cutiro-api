@@ -3,6 +3,7 @@ import pandas as pd
 import string
 import numpy as np
 from scoring import is_anagram
+import boto3
 
 def read_data_from_event(event):
   source_teachers = event["source_teachers"]
@@ -52,6 +53,14 @@ def compare_dates(string1, string2, t):
   if count>t: return 1
   return 0
 
+def save_excel_on_s3(source = "test.xlsx", destination = "test.xlsx"):
+  s3 = boto3.resource(u's3')
+  bucket = s3.Bucket(u'vinouz')
+  bucket.upload_file(source, destination, ExtraArgs={'ACL':'public-read'})
+
+  object_url = "https://vinouz.s3-eu-west-1.amazonaws.com/{0}".format(destination)
+  return object_url
+
 class NpEncoder(json.JSONEncoder):
   def default(self, obj):
     if isinstance(obj, np.integer):
@@ -80,8 +89,8 @@ def previous_matches_df(payroll, emis, event):
   for i in range(1, 5):
     if f"step{i}" in event:
       name = cols[i]
-      #  contains a map of pay_id -> emis_id => Collect all pay_ids
-      matchs_series = pd.DataFrame(event[f'step{i - 1}'], columns=["Numéro Solde", name]).set_index("Numéro Solde")[name]
+      #  contains a map of pay_id -> emis_id => Group by pay_id and collect the list of all matching emis_ids
+      matchs_series = pd.DataFrame(event[f'step{i - 1}'], columns=["Numéro Solde", name]).groupby('Numéro Solde')[name].apply(list)
       payroll = payroll.join(matchs_series)
   # Convert list of IDs to nice display
   for col in cols:
