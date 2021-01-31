@@ -1,8 +1,8 @@
 name: cleaning
 events:
 - http:
-    path: cleaning/start
-    method: get
+    path: cleaning/begin
+    method: post
 
 definition:
   Comment: "Cleaning state machine of cutiro"
