@@ -30,6 +30,8 @@ functions:
     handler : step3/handler.start
   fourth_step:
     handler : step4/handler.start
+  output:
+    handler: output/handler.start
 
 stepFunctions:
   stateMachines:

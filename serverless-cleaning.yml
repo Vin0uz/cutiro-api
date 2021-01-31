@@ -32,4 +32,9 @@ definition:
       Type: Task
       Resource:
         Fn::GetAtt: [fourth_step, Arn]
+      Next: Output
+    Output:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [output, Arn]
       End: true
