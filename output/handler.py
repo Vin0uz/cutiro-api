@@ -16,7 +16,7 @@ def start(event, context):
   file_url = save_excel_on_s3(filepath, filename)
 
   response = {
-    "id": event["id"],
+    "batch_id": event["batch_id"],
     "file_url": file_url
   }
 

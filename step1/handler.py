@@ -18,7 +18,7 @@ def start(event, context):
   step1, step2 = step_1_and_2(emis, payroll)
 
   response = {
-    "id": event["id"],
+    "batch_id": event["batch_id"],
     "source_teachers": event["source_teachers"],
     "source_payrolls": event["source_payrolls"],
     "payroll_duplicates": event["payroll_duplicates"],
