@@ -75,7 +75,7 @@ def low_similary_match(emis, payroll, threshold=(2, 0.7)):
     df_name = emis[emis['clean_surname'] == p_surname]
     for j in df_name.index:
       e_id = df_name._get_value(j, 'Numéro EMIS')
-      e_dob = df_dob._get_value(j, 'Date of birth')
+      e_dob = df_name._get_value(j, 'Date of birth')
       e_firstname = df_name._get_value(j, 'teacher_name')
       e_clean_firstname = df_name._get_value(j, 'clean_name')
 
