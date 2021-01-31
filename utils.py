@@ -94,7 +94,7 @@ def previous_matches_df(payroll, emis, event):
       payroll = payroll.join(matchs_series)
   # Convert list of IDs to nice display
   for col in cols:
-    payroll[col].apply(lambda l: ids_to_details(l, emis))
+      payroll[col] = payroll[col].apply(lambda l: ids_to_details(l, emis))
   # Ghosts teachers
   ghosts = pd.Series(
     ['Oui' for _ in range(len(event['ghosts']))],
@@ -108,14 +108,15 @@ def previous_matches_df(payroll, emis, event):
 def ids_to_details(ids, emis):
     details = []
     emis = emis.set_index('Numéro EMIS')  # For faster matching
-    if pd.notnull(ids):
+    if type(ids) == float:  # As some rows will have pd.nan -> float
+      return ""
+    else:
       for e_id in ids:
           row = emis.iloc[e_id]
           birth = "né" if row['teacher_sex'] == 'Male' else 'née'
           details.append(f"{row['teacher_name']} {row['teacher_surname']}, "
                          f"{birth} le {row['Date of birth'].strftime('%d-%m-%Y')} (EMIS ID #{e_id})")
       return ", ".join(details)
-    return ""
 
 
 def output_excels(payroll, emis, event, filepath):
