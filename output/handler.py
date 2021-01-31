@@ -18,14 +18,11 @@ def start(event, context):
   file_url = save_excel_on_s3(filepath, filename)
 
   response = {
-    "cleaning": {
-      "result_url": file_url,
-      "id": event["batch_id"]
-    }
+    "result_url": file_url
   }
 
-  url = "https://cutiro.herokuapp.com/cleaning"
-  myResponse = requests.post(url, data = response)
+  url = f"https://cutiro.herokuapp.com/cleaning/refresh/{event["batch_id"]}"
+  myResponse = requests.get(url, data = response)
   if(myResponse.ok):
     print("API call was ok")
   else:
