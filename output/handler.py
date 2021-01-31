@@ -9,7 +9,7 @@ def start(event, context):
       "source_payrolls": event["source_payrolls"]
   })
 
-  filename = f'/tmp/{uuid.uuid1()}.xlsx'
+  filename = f'{uuid.uuid1()}.xlsx'
   filepath = f'/tmp/{filename}'
   output_excels(payroll, emis, event, filepath)
 
