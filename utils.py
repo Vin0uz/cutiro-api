@@ -108,12 +108,14 @@ def previous_matches_df(payroll, emis, event):
 def ids_to_details(ids, emis):
     details = []
     emis = emis.set_index('Numéro EMIS')  # For faster matching
-    for e_id in ids:
-        row = emis.iloc[e_id]
-        birth = "né" if row['teacher_sex'] == 'Male' else 'née'
-        details.append(f"{row['teacher_name']} {row['teacher_surname']}, "
-                       f"{birth} le {row['Date of birth'].strftime('%d-%m-%Y')} (EMIS ID #{e_id})")
-    return ", ".join(details)
+    if pd.notnull(ids):
+      for e_id in ids:
+          row = emis.iloc[e_id]
+          birth = "né" if row['teacher_sex'] == 'Male' else 'née'
+          details.append(f"{row['teacher_name']} {row['teacher_surname']}, "
+                         f"{birth} le {row['Date of birth'].strftime('%d-%m-%Y')} (EMIS ID #{e_id})")
+      return ", ".join(details)
+    return ""
 
 
 def output_excels(payroll, emis, event, filepath):
