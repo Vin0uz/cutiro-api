@@ -18,7 +18,7 @@ def start(event, context):
     "source_payrolls": event["source_payrolls"],
     "step1_ids": event["step1_ids"],
     "step2_ids": event["step2_ids"],
-    "step3_ids": event["step23_ids"],
+    "step3_ids": event["step3_ids"],
     "step4_ids": json.dumps(mapping, cls=NpEncoder)
   }
 
