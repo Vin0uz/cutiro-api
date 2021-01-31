@@ -9,9 +9,10 @@ def start(event, context):
       "source_payrolls": event["source_payrolls"]
   })
 
-  filepath = f'./{uuid.uuid1()}.xlsx'
-  output_excels(payroll, emis, event, filepath)
+  file = output_excels(payroll, emis, event)
+  filename = f'{uuid.uuid1()}.xlsx'
   # ToDo @VinOuz: store in S3 bucket and return the URL
+  filepath = "store file in S3"
 
   response = {
     "filepath": filepath

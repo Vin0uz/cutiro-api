@@ -3,6 +3,8 @@ import pandas as pd
 import string
 import numpy as np
 from scoring import is_anagram
+import io
+
 
 def read_data_from_event(event):
   source_teachers = event["source_teachers"]
@@ -86,7 +88,9 @@ def previous_matches_df(payroll, event):
   return payroll
 
 
-def output_excels(payroll, emis, event, filepath):
-    with pd.ExcelWriter(filepath) as writer:
+def output_excels(payroll, emis, event):
+    f = io.BytesIO()
+    with pd.ExcelWriter(f) as writer:
         previous_matches_df(payroll, event).to_excel(writer, index=False, sheet_name='Payroll')
         emis.to_excel(writer, index=False, sheet_name='EMIS')
+    return f
